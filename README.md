@@ -1,4 +1,5 @@
 Fact caching (enable in ansible.cfg)
+---
 [defaults]
 fact_caching = jsonfile
 fact_caching_connection = /tmp/ansible_facts
@@ -6,6 +7,7 @@ fact_caching_timeout = 86400
 
 
 Add
+---
 cacheable: yes
 to playbook set_fact task
 
