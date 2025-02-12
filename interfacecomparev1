@@ -1,0 +1,39 @@
+---
+- name: "Compare packets input on interface gi0/1 without regex"
+  hosts: cisco_switch
+  gather_facts: no
+  connection: network_cli
+  vars:
+    ansible_network_os: ios
+  tasks:
+    - name: "Get interface statistics (first snapshot)"
+      ios_command:
+        commands:
+          - "show interfaces gi0/1"
+      register: stats_first
+
+    - name: "Extract initial packets input count"
+      set_fact:
+        initial_packets: "{{ (stats_first.stdout[0].split('packets input')[0].split() | last) | int }}"
+
+    - name: "Display initial packets input"
+      debug:
+        msg: "Initial packets input: {{ initial_packets }}"
+
+    - name: "Pause for 30 seconds"
+      pause:
+        seconds: 30
+
+    - name: "Get interface statistics (second snapshot)"
+      ios_command:
+        commands:
+          - "show interfaces gi0/1"
+      register: stats_second
+
+    - name: "Extract future packets input count"
+      set_fact:
+        future_packets: "{{ (stats_second.stdout[0].split('packets input')[0].split() | last) | int }}"
+
+    - name: "Display result and comparison"
+      debug:
+        msg: "Initial packets input: {{ initial_packets }}, Future packets input: {{ future_packets }}. Increased: {{ future_packets > initial_packets }}"
