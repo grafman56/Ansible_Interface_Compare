@@ -1,0 +1,26 @@
+---
+- name: "Store initial packets input value to a file"
+  hosts: cisco_switch
+  gather_facts: no
+  connection: network_cli
+  vars:
+    ansible_network_os: ios
+  tasks:
+    - name: "Get interface statistics (first snapshot)"
+      ios_command:
+        commands:
+          - "show interfaces gi0/1"
+      register: stats_first
+
+    - name: "Extract initial packets input count"
+      set_fact:
+        initial_packets: "{{ (stats_first.stdout[0].split('packets input')[0].split() | last) | int }}"
+
+    - name: "Display initial packets input"
+      debug:
+        msg: "Initial packets input: {{ initial_packets }}"
+
+    - name: "Store initial_packets to file"
+      copy:
+        content: "{{ initial_packets }}"
+        dest: "/tmp/initial_packets.txt"
