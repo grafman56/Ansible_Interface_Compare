@@ -1,3 +1,5 @@
+For ansible 2.8+
+---
 Fact caching (enable in ansible.cfg)
 ---
 [defaults]
@@ -21,3 +23,17 @@ Later play
     - name: "Display cached initial_packets value"
       debug:
         msg: "Cached initial_packets: {{ hostvars[inventory_hostname].initial_packets }}"
+
+For storing value in txt
+---
+- name: "Store initial_packets to file"
+      copy:
+        content: "{{ initial_packets }}"
+        dest: "/tmp/initial_packets.txt"
+
+then, for reading stored txt value
+---
+- name: "Read initial_packets from file"
+      slurp:
+        src: "/tmp/initial_packets.txt"
+      register: stored_initial
