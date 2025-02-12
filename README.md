@@ -1,4 +1,4 @@
-For ansible 2.8+
+First Option - For ansible 2.8+
 ---
 Fact caching (enable in ansible.cfg)
 ---
@@ -24,7 +24,7 @@ Later play
       debug:
         msg: "Cached initial_packets: {{ hostvars[inventory_hostname].initial_packets }}"
 
-For storing value in txt
+Second Option - For storing value in txt
 ---
 - name: "Store initial_packets to file"
       copy:
