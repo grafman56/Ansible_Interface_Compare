@@ -1,0 +1,30 @@
+---
+- name: "Compare current packets input with stored initial value"
+  hosts: cisco_switch
+  gather_facts: no
+  connection: network_cli
+  vars:
+    ansible_network_os: ios
+  tasks:
+    - name: "Read initial_packets from file"
+      slurp:
+        src: "/tmp/initial_packets.txt"
+      register: stored_initial
+
+    - name: "Set initial_packets fact from file content"
+      set_fact:
+        initial_packets: "{{ stored_initial.content | b64decode | int }}"
+
+    - name: "Get interface statistics (current snapshot)"
+      ios_command:
+        commands:
+          - "show interfaces gi0/1"
+      register: stats_current
+
+    - name: "Extract current packets input count"
+      set_fact:
+        current_packets: "{{ (stats_current.stdout[0].split('packets input')[0].split() | last) | int }}"
+
+    - name: "Display comparison"
+      debug:
+        msg: "Stored initial packets input: {{ initial_packets }}, Current packets input: {{ current_packets }}. Increased: {{ current_packets > initial_packets }}"
